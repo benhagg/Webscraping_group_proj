@@ -127,39 +127,61 @@ if user_input == "1":
     general_conference_df = pd.DataFrame(standard_works_dict)
     general_conference_df.to_sql("books_practice", engine, if_exists= 'replace', index= False) # reason to make it into a dataframe
 
-# for url in specific_talk:
+    # for url in specific_talk:
 
-#     print(f"requesting url: {url}")
-#     response = requests.get(url)
-#     specific_talk = BeautifulSoup(response.content, "html.parser")
-#     name_element = table_cells[0].get_text()
-#     talk_name_element = table_cells[4].get_text()
-#     kicker_element = specific_talk.get_text()
+    #     print(f"requesting url: {url}")
+    #     response = requests.get(url)
+    #     specific_talk = BeautifulSoup(response.content, "html.parser")
+    #     name_element = table_cells[0].get_text()
+    #     talk_name_element = table_cells[4].get_text()
+    #     kicker_element = specific_talk.get_text()
 
-#     general_conference_dictionary['name_element'].append(name_element)
-#     general_conference_dictionary['talk_name_element'].append(talk_name_element)
-#     general_conference_dictionary['kicker'].append(kicker_element)
-#     general_conference_dictionary['footnote_section'].append(footnote_section)
+    #     general_conference_dictionary['name_element'].append(name_element)
+    #     general_conference_dictionary['talk_name_element'].append(talk_name_element)
+    #     general_conference_dictionary['kicker'].append(kicker_element)
+    #     general_conference_dictionary['footnote_section'].append(footnote_section)
 
-# df_books_data = pd.DataFrame(general_conference_dictionary)
-# df_books_data.to_sql("books_practice", engine, if_exists= 'replace', index= False) # reason to make it into a dataframe
-print("You've saved the scraped data to your postgres database.")
+    # df_books_data = pd.DataFrame(general_conference_dictionary)
+    # df_books_data.to_sql("books_practice", engine, if_exists= 'replace', index= False) # reason to make it into a dataframe
+    print("You've saved the scraped data to your postgres database.")
 
 
 
 
 
 # Part 2 _________________________________________________________________________________________________________
-query = 'SELECT * FROM general_conference'
-df = pd.read_sql(query, engine)
-def chart_all_talks():
-    # matplotlib function to plot all talks
-    pass
+    def chart_all_talks(df):
+        plt.plot(df.loc[id] == )
+        plt.title('Standard Works Referenced in General Conference')
+        plt.xlabel('Standard Works')
+        plt.ylabel('Number of References')
 
 
-def chart_individual_talk(talk_id):
-    # matplotlib function to plot individual talk
-    pass
+    def chart_individual_talk(talk_id, df):
+        talk_name = df.loc[df['id'] == talk_id, 'title']
+        plt.plot(talk_name, df.lod[df['id'] == talk_id])
+        plt.title(f'Standard Works Referenced in {talk_name}')
+        plt.xlabel('Standard Works Books')
+        plt.ylabel('Number of References')
+        plt.show()
+
+
+elif user_input == "2":
+    user_input2 = input('You selected to see summaries \nPress 1 for summaries of all talks \nPress 2 for summaries of an individual talk \nPress anything else to exit')
+    if user_input2 == 1:
+        query = 'SELECT * FROM general_conference'
+        output_df = pd.read_sql_query(query, engine)
+
+    elif user_input2 ==  2:
+            print('The following are the names of speakers and their talks')
+            for row in output_df.iterrows():
+                print(f"{row['id']}: {row['speaker']} - {row['title']}")
+        # 4
+            user_input3 = input('Enter the number of the talk you want to see the summary of: ')
+        # 5
+            chart_individual_talk(user_input3)
+
+
 
 
 
@@ -183,7 +205,7 @@ if __name__ == '__main__':
     user_input = int(input("Enter 1 for Part 1 or 2 for Part 2: ")) # change the wording
     if user_input == 2:
         # 1
-        user_input2 = input('You selected to see summaries \nPress 1 for summaries of all talks \nPress 2 for summaries of an indibidual talk \nPress anything else to exit')
+       
         # 2
         if user_input2 == 1:
             chart_all_talks()
