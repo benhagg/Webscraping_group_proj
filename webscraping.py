@@ -152,7 +152,8 @@ if user_input == "1":
             footnote_section.count(specific_talk.find('footer', attrs= {'class' : 'notes'}))
         else:
             continue
-
+            
+    # Exports to database
     general_conference_df = pd.DataFrame(standard_works_dict)
     general_conference_df.to_sql("general_conference", engine, if_exists= 'replace', index= False) # reason to make it into a dataframe
 
