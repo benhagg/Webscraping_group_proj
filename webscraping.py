@@ -207,4 +207,7 @@ elif user_input == "2":
             user_input3 = input('\nEnter the number of the talk you want to see the summary of: ')
         # 5
             chart_individual_talk(user_input3, output_df).show()
-
+        
+else:
+        print("Exiting Program")
+        exit()
