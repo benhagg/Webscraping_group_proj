@@ -4,6 +4,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import sqlalchemy
 
+
+
 # Part 1 _________________________________________________________________________________________________________
 # General Conference Webscraping
 # For this project you are going to web scrape the talks from a recent
@@ -39,8 +41,35 @@ conn.execute(drop_sql_query)
 conn.commit()
 conn.close()
 
+# fake data entry TESTING PURPOSES -----------------------------------------------------------------------------------------------
+# fake_data = {
+#     'Speaker_Name': ['John Smith', 'Emily Johnson', 'David Williams', 'Sarah Brown', 'Michael Davis'],
+#     'Talk_Name': ['Faith and Doubt', 'Hope in Adversity', 'Love and Forgiveness', 'Service and Sacrifice', 'Courage and Resilience'],
+#     'Kicker': ['Inspiring Message', 'Powerful Reminder', 'Uplifting Story', 'Heartfelt Testimony', 'Motivational Speech'],
+#     'Matthew': [1, 5, 2, 6, 0],
+#     'Mark': [6, 8, 4, 7, 0],
+#     'Luke': [0, 7, 0, 6, 1],
+#     'John': [5, 6, 7, 8, 0],
+#     'Acts': [1, 0, 0, 0, 1],
+#     # Add fake data for the rest of the books...
+#     'Articles of Faith': [0, 1, 0, 0, 0]
+# }
+
+# df = pd.DataFrame(fake_data)
+# insert_data = df.to_sql("general_conference", engine, if_exists='replace', index=False) # reason to make it into a dataframe
+# conn = engine.connect()
+# conn.commit()
+# conn.close()
+# this is fake data for testing purposes delete before turning in
+# END fake data entry TESTING PURPOSES -----------------------------------------------------------------------------------------------
+
+
+
+
+
+
 # DICTIONARY
-conference_dictionary = {"Speaker Name" : [], "Talk Name" : [], "Kicker" : []}
+conference_dictionary = {"Speaker Name" : [], "Talk Name" : [], "Kicker" : []} # do we use this? - Ben
 standard_works_dict = {'Speaker_Name' : [], 'Talk_Name' : [], 'Kicker' : [],
 'Matthew': [], 'Mark': [], 'Luke': [], 'John': [], 'Acts': [], 'Romans': [], 
 '1 Corinthians': [], '2 Corinthians': [], 'Galatians': [], 'Ephesians': [],
@@ -62,8 +91,29 @@ standard_works_dict = {'Speaker_Name' : [], 'Talk_Name' : [], 'Kicker' : [],
 'Articles of Faith': []}
 
 
+# part 2 functions -----------------------------------------------------------------------------------------------
+def chart_all_talks(df):
+    # filtered_dict = {key: value for key, value in dict.items() if value > 2}
+    sum_val_df = df.drop(['Speaker_Name', 'Talk_Name', 'Kicker'], axis=1).sum()
+    sum_val_df = sum_val_df[sum_val_df > 2] # filter out values less than 2
+    plt.bar(sum_val_df.index, sum_val_df)
+    plt.title('Standard Works Referenced in General Conference')
+    plt.ylabel('Number of References')
+    plt.show()
 
-# PART I steps 4-6
+
+def chart_individual_talk(talk_id, df):
+    talk_name = df.iloc[int(talk_id) - 1]['Talk_Name'] # gets the title value of the talk_id
+    std_works = df.iloc[int(talk_id) - 1].drop(['Speaker_Name', 'Talk_Name', 'Kicker']) # drops the speaker name, talk name, and kicker
+    std_works = std_works[std_works >= 1] # filter out values less than 2
+    plt.bar(std_works.index, std_works) # (talk: x, talk row: y)
+    plt.title(f'Standard Works Referenced in {talk_name}')
+    plt.xlabel('Standard Works Books')
+    plt.ylabel(f'Number of References in {talk_name}')
+    return plt
+
+# PART I steps 4-6 -----------------------------------------------------------------------------------------------
+
 user_input = input("If you want to scrape data, enter 1. If you want to see summaries of stored data, enter 2. Enter any other value to exit the program: ")
 
 if user_input == "1":
@@ -77,9 +127,8 @@ if user_input == "1":
     # creating requests and soup variables to get access to website
     response = requests.get("https://www.churchofjesuschrist.org/study/general-conference/2023/10?lang=eng ")
     soup = BeautifulSoup(response.content, "html.parser")
-
-    # extracting talk links
-    talk_links = [link.get("href") for link in soup.find_all("a", class_="lumen-tile__link")]
+    talk_links = soup.find_all("li") # gets all <a> tags
+    hrefs = [link.get("href") for link in talk_links]
 
     # talk list
     talk_list = []
@@ -150,70 +199,27 @@ if user_input == "1":
 
 
 # Part 2 _________________________________________________________________________________________________________
-    def chart_all_talks(df):
-        plt.plot(df.loc[id] == )
-        plt.title('Standard Works Referenced in General Conference')
-        plt.xlabel('Standard Works')
-        plt.ylabel('Number of References')
-
-
-    def chart_individual_talk(talk_id, df):
-        talk_name = df.loc[df['id'] == talk_id, 'title']
-        plt.plot(talk_name, df.lod[df['id'] == talk_id])
-        plt.title(f'Standard Works Referenced in {talk_name}')
-        plt.xlabel('Standard Works Books')
-        plt.ylabel('Number of References')
-        plt.show()
 
 
 elif user_input == "2":
-    user_input2 = input('You selected to see summaries \nPress 1 for summaries of all talks \nPress 2 for summaries of an individual talk \nPress anything else to exit')
-    if user_input2 == 1:
-        query = 'SELECT * FROM general_conference'
-        output_df = pd.read_sql_query(query, engine)
 
-    elif user_input2 ==  2:
-            print('The following are the names of speakers and their talks')
-            for row in output_df.iterrows():
-                print(f"{row['id']}: {row['speaker']} - {row['title']}")
+    user_input2 = input('You selected to see summaries \nPress 1 for summaries of all talks \nPress 2 for summaries of an individual talk \nPress anything else to exit: ')
+    if user_input2 not in ['1', '2']: # exit if not 1 or 2
+        print('Exiting Program')
+        exit()
+
+    query = 'SELECT * FROM general_conference'
+    output_df = pd.read_sql(query, engine)
+
+    if user_input2 == '1': # all standard works with  > 2 references in general conference db
+        chart_all_talks(output_df)
+
+    elif user_input2 ==  '2': # display speaker and talk info
+            print('\nThe following are the names of speakers and their talks \n')
+            for row in output_df.iterrows(): # prints out id: speaker name - talk name
+                print(f"{row[0] + 1}: {row[1]['Speaker_Name']} - {row[1]['Talk_Name']}")
         # 4
-            user_input3 = input('Enter the number of the talk you want to see the summary of: ')
+            user_input3 = input('\nEnter the number of the talk you want to see the summary of: ')
         # 5
-            chart_individual_talk(user_input3)
+            chart_individual_talk(user_input3, output_df).show()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-if __name__ == '__main__':
-    user_input = int(input("Enter 1 for Part 1 or 2 for Part 2: ")) # change the wording
-    if user_input == 2:
-        # 1
-       
-        # 2
-        if user_input2 == 1:
-            chart_all_talks()
-        if user_input2 ==  2:
-            print('The following are the names of speakers and their talks')
-            for row in df.iterrows():
-                print(f"{row['id']}: {row['speaker']} - {row['title']}")
-        # 4
-            user_input3 = input('Enter the number of the talk you want to see the summary of: ')
-        # 5
-            chart_individual_talk(user_input3)
