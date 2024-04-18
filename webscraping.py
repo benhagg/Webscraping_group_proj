@@ -52,11 +52,6 @@ standard_works_dict = {'Speaker_Name' : [], 'Talk_Name' : [], 'Kicker' : [],
 [], 'Abraham': [], 'Joseph Smith—Matthew': [], 'Joseph Smith—History': [],
 'Articles of Faith': []}
 
-# # set all books to zero
-# standard_works_dict = {key: 0 for idx, key in enumerate(standard_works_dict)}
-# for key in list(standard_works_dict.keys())[3:]:
-#     standard_works_dict[key] = 0
-
 # part 2 functions -----------------------------------------------------------------------------------------------
 def chart_all_talks(df):
     # filtered_dict = {key: value for key, value in dict.items() if value > 2}
@@ -182,9 +177,7 @@ if user_input == "1":
     print("You've saved the scraped data to your postgres database.")
 
 
-
-# Part 2 _________________________________________________________________________________________________________
-
+# Part II
 
 elif user_input == "2":
 
@@ -207,7 +200,4 @@ elif user_input == "2":
             user_input3 = input('\nEnter the number of the talk you want to see the summary of: ')
         # 5
             chart_individual_talk(user_input3, output_df).show()
-        
-else:
-        print("Exiting Program")
-        exit()
+
